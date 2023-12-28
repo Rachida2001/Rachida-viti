@@ -1,0 +1,77 @@
+Create a VPN connection Site-to-Site VPN using OpenSwan documentation.
+
+ To establish a site-to-site VPN connection between your personal AWS account and the organization's account using OpenSwan as the customer gateway, follow these steps:
+
+
+Prerequisites:
+
+Access to both personal and organization AWS accounts.
+
+Permission to create and configure VPCs, subnets, and VPN connections.
+
+Configuration Steps:
+
+STEP 1 OpenSwan Setup in the organization Account (ON-PREMISES VPC):
+
+Launch a t2.micro instance in your account on a public subnet.
+
+Disable source/destination checks on the EC2.
+
+
+
+ 
+
+3. The security group set up the Inbound rules:
+
+
+ 
+
+STEP 2 - AWS VPC Configuration
+
+Create VPC and Subnets:
+
+In your account, set up a VPC with a non-overlapping CIDR block compared to the organization's VPC.
+
+Create public and private subnets within this VPC.
+
+2. Create Customer Gateway:
+
+In your account, establish a customer gateway, designating the public IP address of the OpenSwan instance as the gateway's IP.
+
+
+3. Create Virtual Private Gateway (VGW):
+
+Within the organization's account, generate a virtual private gateway and attach it to the organization's VPC.
+
+
+4. Set Up Site-to-Site VPN Connection:
+
+Create a site-to-site VPN connection in the organization's account, specifying the customer gateway from your account, and download the VPN configuration as OpenSwan type.
+
+
+5. Update Route Tables:
+
+In both accounts, update the respective VPCs' route tables to direct traffic to the other VPC through the VPN connection.
+
+
+6. Install and configure OpenSwan on the instance in the organization Account (ON-PREMISES VPC) by referring to OpenSwan documentation that you download as OpenSwan type in step 6 for installation guidelines. 
+
+SSH into the OpenSwan instance created in the organization Account To install OpenSwan
+
+In the CLI run the command “yum install openswan –y” as a root user.
+
+After that, follow the instructions in the downloaded configuration file and configure Tunnel 1 steps.
+
+run the command systemctl status ipsec to start the IPsec service.
+
+run the command systemctl status ipsec the status command will show you information about whether the service is active, inactive, or encountering any issues.
+
+
+7. Test Connection:
+
+Verify connectivity by pinging an instance in the organization's VPC from an instance in your account.
+
+
+Conclusion:
+
+Setting up a site-to-site VPN connection using OpenSwan as the customer gateway between your personal and organization's AWS accounts empowers secure and seamless data transfer across VPCs. This comprehensive guide, detailing step-by-step configurations, ensures a robust and reliable VPN infrastructure. This setup fosters seamless communication and data exchange across VPCs, ensuring a secure network environment for efficient operations.

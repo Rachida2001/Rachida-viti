@@ -1,0 +1,82 @@
+- name: Install CloudWatch agent on EC2 instances in private subnets via ELB as bastion host
+  hosts: localhost
+  gather_facts: false
+  vars:
+    elb_dns: "ELB-Basion-host-ssh-2161de3ddfb1a086.elb.us-east-1.amazonaws.com"
+    bastion_user: "ec2-user"
+    private_key: "/etc/ansible/pro_key.pem"
+    ec2_region: "us-east-1"
+    asg_name: "efs-ASG"
+    cw_agent_config_file: "/tmp/cw_agent_config.json"
+    instance_id: "your_instance_id_here"
+
+  tasks:
+    - name: Ensure unzip package is installed
+      become: yes
+      package:
+        name: unzip
+        state: present  # or latest for updating to the latest version
+
+    - name: Get EC2 instances from ASG via ELB
+      community.aws.ec2_instance_info:
+        region: "{{ ec2_region }}"
+        filters:
+          "tag:aws:autoscaling:groupName": "{{ asg_name }}"
+      register: asg_instances
+
+    - name: Create CloudWatch agent config file
+      copy:
+        content: |
+          {
+            "metrics": {
+              "append_dimensions": {
+                "AutoScalingGroupName": "{{ asg_name }}"
+              },
+              "metrics_collected": {
+                "mem": {
+                  "measurement": [
+                    "mem_used_percent"
+                  ],
+                  "metrics_collection_interval": 60
+                },
+                "disk": {
+                  "measurement": [
+                    "used_percent"
+                  ],
+                  "metrics_collection_interval": 60,
+                  "resources": [
+                    "/"
+                  ]
+                }            
+   			}
+				
+            }
+          }
+        dest: "{{ cw_agent_config_file }}"
+
+    - name: Download and install CloudWatch monitoring scripts
+      ansible.builtin.get_url:
+        url: "https://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.2.zip"
+        dest: "/tmp/CloudWatchMonitoringScripts-1.2.2.zip"
+
+    - name: Ensure the CloudWatch directory exists
+      ansible.builtin.file:
+        path: "/tmp/aws-scripts-mon"
+        state: directory
+
+    - name: Install CloudWatch monitoring scripts
+      ansible.builtin.unarchive:
+        src: "/tmp/CloudWatchMonitoringScripts-1.2.2.zip"
+        dest: "/tmp/aws-scripts-mon"
+
+    - name: Run memory usage command
+      shell: "free | grep Mem | awk '{print $3/$2 * 100.0}'"
+      register: memory_data
+
+    - name: Send Memory Metrics to CloudWatch
+      command: >
+        aws cloudwatch put-metric-data
+        --namespace "CustomMetrics"
+        --metric-name "MemoryUsage"
+        --dimensions InstanceId="{{ instance_id }}"
+        --value "{{ memory_data.stdout }}"

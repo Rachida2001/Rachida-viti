@@ -1,0 +1,37 @@
+Step-by-Step Guide to Create VPC Peering:
+Access AWS Console: Log in to your AWS Management Console.
+
+Navigate to VPC Dashboard: Go to the VPC Dashboard by selecting "Services" and then choosing "VPC" under the Networking & Content Delivery section.
+
+Create Peering Connection:
+
+Select "Peering Connections": From the left-hand menu in the VPC Dashboard, click on "Peering Connections" under the "Peering" section.
+
+Click "Create Peering Connection": Select "Create Peering Connection" and follow the wizard.
+
+Specify Peering Details:
+
+Provide Peering Connection Details: Enter a name for the peering connection and specify your VPC and the peer VPC IDs.
+Add Peer VPC ID: Input the ID of the VPC you want to peer with.
+Add Peer Owner's Account ID: If the peer VPC is in another AWS account, enter that account's ID.
+Review and Create: Review the details and click "Create Peering Connection" to initiate the connection.
+
+Accept Peering Connection:
+
+Notify Peer Account: If peering with a VPC in another account, notify the account owner to accept the peering request.
+
+Accept Peering Request: In the peer account's VPC Peering Connections panel, the request will appear. The owner needs to select the request and accept it.
+
+Update Route Tables:
+
+Add Routes: Once the peering connection is established and accepted, update the route tables in both VPCs to allow traffic to flow between them.
+
+Add Routes to Route Tables: In the route tables of each VPC, add routes pointing to the CIDR blocks of the respective peer VPCs and associate them with the peering connection.
+
+Testing Connectivity:
+
+Check Connectivity: Confirm the connectivity between instances in both VPCs by pinging or accessing resources across the peered connection.
+Note:
+Ensure that there are no overlapping CIDR blocks between the VPCs.
+Verify that both VPCs have proper route table entries allowing traffic to pass through the peering connection.
+This process may slightly differ based on AWS regions and console updates, but it generally follows these steps. Always refer to the AWS documentation or guides for the most accurate and updated information.

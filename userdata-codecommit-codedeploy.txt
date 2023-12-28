@@ -1,0 +1,54 @@
+The updated userdata:
+
+#!/bin/bash
+
+export HOME=/root   # Set HOME environment variable
+
+ yum update -y
+
+yum install httpd -y
+
+systemctl start httpd
+
+systemctl enable httpd
+
+yum install git -y
+
+ # Configure Git credentials
+
+git config --global credential.helper '!aws codecommit credential-helper $@'
+
+git config --global credential.UseHttpPath true
+
+ cd /var/www/html || exit 1  # Ensure the directory exists
+
+ # Clone the Git repository
+
+git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/Procore-repo || exit 1
+
+cd Procore-repo/ || exit 1
+
+ # Copy contents to parent directory
+
+cp -r . ..
+
+ # Change ownership to apache
+
+chown -R apache:apache /var/www/html
+
+ # Restart Apache
+
+systemctl restart httpd
+
+ # Install the CodeDeploy agent
+
+sudo yum update -y
+
+sudo yum install -y ruby
+
+wget https://aws-codedeploy-us-east-1.s3.amazonaws.com/latest/install
+
+chmod +x ./install
+
+sudo ./install auto
+

@@ -1,0 +1,22 @@
+SSM document: “break-glass-user-ssh”
+
+{
+  "schemaVersion": "2.2",
+  "description": "Create break-glass user with SSH key",
+  "mainSteps": [
+    {
+      "action": "aws:runShellScript",
+      "name": "createUserAndSetKey",
+      "inputs": {
+        "runCommand": [
+          "useradd break-glass",
+          "mkdir -p /home/break-glass/.ssh",
+          "echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDg4Tss2eHWT2Z/6SYYMNb2hzmcl0hoxckGhTf3KVIVpRFrfRks3Qnh2oGycey2icwYfrun1vWm6rmUug9hZTVTHfsabj++xylEu/8XuQto0HeWp9tk4iwNku6EZ+JBzuR7iHrVZcwqSCQn5ln9SaKALO ucCqoDNQq/gWIYPmZVE0WD+66pIfKuUvaADNpVecn4B+AGsfBgAeKVz63zXqxbR8Y3Hjl2rvVfGBSGj9kxykH9klI0ew3falGh3D5JNpxXRyWg2u9LkLXEqqXRJXF9JqRKT0ZqTLaprWqOe6U7DoHV8ktyYyE6F1WqwjU4g0f8+gYQ8DgQK8ijcwnZmnfAo21RniftymQRoGx6rr3o0TshA61WwC/lI90jnLakt89KWlEvMtb4jWkL0a9NuaUQf21c29lYvQfLSRyqqMXanGrkcrhCG0iY39gwAYVPMotulycd4BEOxv9sVDCoeHcDkJZw4XYVpSJvI1+vh41gquJJLEuA3Sq997uxSrOSjCPncOqSeOd63TJYXYk1hR6rbkipoqwglDrRbWKFZo+aWYpBISDV/ap0a9S4c3ltRrwJN6BgI5ZvHWEw0wUQA/VKnRlFtnvNYylIlMFnDj' > /home/break-glass/.ssh/authorized_keys",
+          "chown -R break-glass:break-glass /home/break-glass/.ssh",
+          "chmod 700 /home/break-glass/.ssh",
+          "chmod 600 /home/break-glass/.ssh/authorized_keys"
+        ]
+      }
+    }
+  ]
+}
